@@ -1,0 +1,842 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>Matiks Hiring Assignment — AI Content System</title>
+<link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=DM+Mono:wght@400;500&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet"/>
+<style>
+  :root {
+    --bg: #0a0a0a;
+    --surface: #111111;
+    --surface2: #1a1a1a;
+    --border: #222222;
+    --border2: #2e2e2e;
+    --accent: #e8ff47;
+    --accent2: #ff6b35;
+    --accent3: #47d4ff;
+    --text: #f0f0f0;
+    --muted: #888;
+    --muted2: #555;
+    --font-head: 'Syne', sans-serif;
+    --font-body: 'DM Sans', sans-serif;
+    --font-mono: 'DM Mono', monospace;
+    --radius: 12px;
+    --radius-sm: 6px;
+  }
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  body { background: var(--bg); color: var(--text); font-family: var(--font-body); font-size: 15px; line-height: 1.7; }
+
+  /* LAYOUT */
+  .page { max-width: 900px; margin: 0 auto; padding: 0 32px; }
+
+  /* HERO */
+  .hero { padding: 80px 0 60px; border-bottom: 1px solid var(--border); }
+  .tag { display: inline-block; background: var(--accent); color: #0a0a0a; font-family: var(--font-mono); font-size: 11px; font-weight: 500; letter-spacing: .08em; padding: 4px 10px; border-radius: var(--radius-sm); margin-bottom: 24px; }
+  .hero h1 { font-family: var(--font-head); font-size: clamp(38px, 6vw, 64px); font-weight: 800; line-height: 1.05; letter-spacing: -.02em; margin-bottom: 20px; }
+  .hero h1 span { color: var(--accent); }
+  .hero-meta { display: flex; gap: 32px; margin-top: 32px; flex-wrap: wrap; }
+  .hero-meta-item { font-family: var(--font-mono); font-size: 12px; color: var(--muted); }
+  .hero-meta-item strong { display: block; color: var(--accent3); font-size: 14px; margin-bottom: 2px; }
+
+  /* SECTIONS */
+  section { padding: 64px 0; border-bottom: 1px solid var(--border); }
+  section:last-child { border-bottom: none; }
+  .section-label { font-family: var(--font-mono); font-size: 11px; color: var(--accent); letter-spacing: .12em; text-transform: uppercase; margin-bottom: 16px; display: flex; align-items: center; gap: 8px; }
+  .section-label::before { content: ''; width: 20px; height: 1px; background: var(--accent); }
+  h2 { font-family: var(--font-head); font-size: 28px; font-weight: 700; line-height: 1.2; margin-bottom: 24px; }
+  h3 { font-family: var(--font-head); font-size: 18px; font-weight: 600; margin-bottom: 12px; color: var(--text); }
+  p { color: #ccc; margin-bottom: 16px; }
+  p:last-child { margin-bottom: 0; }
+
+  /* CARDS */
+  .card { background: var(--surface); border: 1px solid var(--border2); border-radius: var(--radius); padding: 24px; margin-bottom: 16px; }
+  .card-accent { border-left: 3px solid var(--accent); }
+  .card-blue { border-left: 3px solid var(--accent3); }
+  .card-orange { border-left: 3px solid var(--accent2); }
+
+  /* GRID */
+  .grid-2 { display: grid; grid-template-columns: repeat(2, 1fr); gap: 16px; }
+  .grid-3 { display: grid; grid-template-columns: repeat(3, 1fr); gap: 16px; }
+  @media(max-width: 640px) { .grid-2, .grid-3 { grid-template-columns: 1fr; } }
+
+  /* WORKFLOW */
+  .workflow { display: flex; flex-direction: column; gap: 0; }
+  .workflow-step { display: flex; gap: 20px; align-items: flex-start; }
+  .workflow-step:not(:last-child) { padding-bottom: 0; }
+  .step-left { display: flex; flex-direction: column; align-items: center; min-width: 40px; }
+  .step-num { width: 36px; height: 36px; border-radius: 50%; background: var(--accent); color: #0a0a0a; font-family: var(--font-mono); font-size: 13px; font-weight: 500; display: flex; align-items: center; justify-content: center; flex-shrink: 0; }
+  .step-line { width: 1px; flex: 1; background: var(--border2); min-height: 28px; margin: 4px 0; }
+  .step-content { padding: 4px 0 28px; flex: 1; }
+  .step-content h4 { font-family: var(--font-head); font-size: 15px; font-weight: 600; margin-bottom: 6px; }
+  .step-content p { font-size: 14px; color: var(--muted); margin-bottom: 8px; }
+
+  /* TOOL TAG */
+  .tool-tag { display: inline-flex; align-items: center; gap: 5px; background: var(--surface2); border: 1px solid var(--border2); border-radius: 4px; font-family: var(--font-mono); font-size: 11px; color: var(--accent3); padding: 3px 8px; margin: 2px; }
+
+  /* BOTTLENECK TABLE */
+  .btable { width: 100%; border-collapse: collapse; margin-top: 16px; }
+  .btable th { font-family: var(--font-mono); font-size: 11px; color: var(--muted); font-weight: 400; letter-spacing: .06em; padding: 8px 12px; border-bottom: 1px solid var(--border2); text-align: left; }
+  .btable td { padding: 12px; border-bottom: 1px solid var(--border); font-size: 14px; color: #ccc; vertical-align: top; }
+  .btable tr:last-child td { border-bottom: none; }
+  .severity { display: inline-block; font-family: var(--font-mono); font-size: 10px; padding: 2px 7px; border-radius: 3px; }
+  .sev-high { background: #2a1010; color: #ff6b6b; border: 1px solid #3a1515; }
+  .sev-med { background: #1a1a0a; color: #ffcc44; border: 1px solid #2a2a10; }
+  .sev-low { background: #0a1a0a; color: #44cc88; border: 1px solid #103010; }
+
+  /* METRIC */
+  .metrics { display: flex; gap: 16px; flex-wrap: wrap; margin: 24px 0; }
+  .metric { flex: 1; min-width: 140px; background: var(--surface2); border: 1px solid var(--border2); border-radius: var(--radius); padding: 20px; }
+  .metric-num { font-family: var(--font-head); font-size: 32px; font-weight: 800; color: var(--accent); }
+  .metric-label { font-size: 12px; color: var(--muted); margin-top: 4px; }
+
+  /* DIVIDER */
+  .divider { height: 1px; background: var(--border); margin: 32px 0; }
+
+  /* SCALE TABLE */
+  .scale-row { display: flex; align-items: flex-start; gap: 16px; padding: 16px 0; border-bottom: 1px solid var(--border); }
+  .scale-row:last-child { border-bottom: none; }
+  .scale-icon { font-size: 22px; width: 40px; flex-shrink: 0; }
+  .scale-text h4 { font-size: 14px; font-weight: 500; margin-bottom: 4px; }
+  .scale-text p { font-size: 13px; color: var(--muted); margin: 0; }
+
+  /* CODE BLOCK */
+  .code-block { background: var(--surface2); border: 1px solid var(--border2); border-radius: var(--radius-sm); padding: 16px; font-family: var(--font-mono); font-size: 12px; color: #aaa; overflow-x: auto; line-height: 1.6; margin-top: 12px; }
+  .code-block .kw { color: var(--accent); }
+  .code-block .str { color: var(--accent3); }
+  .code-block .cmt { color: var(--muted2); }
+
+  /* PROTOTYPE BOX */
+  .proto-box { background: var(--surface2); border: 1px solid var(--accent); border-radius: var(--radius); padding: 24px; }
+  .proto-box h3 { color: var(--accent); }
+
+  /* BADGE */
+  .badge { display: inline-block; font-family: var(--font-mono); font-size: 10px; padding: 3px 8px; border-radius: 3px; margin-left: 8px; background: var(--surface2); border: 1px solid var(--border2); color: var(--muted); vertical-align: middle; }
+
+  /* STACK LIST */
+  .stack-list { list-style: none; }
+  .stack-list li { display: flex; align-items: flex-start; gap: 10px; padding: 10px 0; border-bottom: 1px solid var(--border); font-size: 14px; color: #ccc; }
+  .stack-list li:last-child { border-bottom: none; }
+  .stack-list li::before { content: '→'; color: var(--accent); font-family: var(--font-mono); flex-shrink: 0; margin-top: 1px; }
+
+  /* CALLOUT */
+  .callout { background: #141a0a; border: 1px solid #3a5010; border-radius: var(--radius); padding: 20px; margin: 24px 0; }
+  .callout-title { font-family: var(--font-mono); font-size: 12px; color: var(--accent); margin-bottom: 8px; }
+  .callout p { font-size: 14px; color: #aad060; margin: 0; }
+
+  /* PART HEADER */
+  .part-header { background: var(--surface); border: 1px solid var(--border2); border-radius: var(--radius); padding: 28px; margin-bottom: 40px; display: flex; align-items: center; gap: 20px; }
+  .part-num { font-family: var(--font-head); font-size: 48px; font-weight: 800; color: var(--border2); line-height: 1; }
+  .part-title { font-family: var(--font-head); font-size: 20px; font-weight: 700; }
+  .part-desc { font-size: 14px; color: var(--muted); margin-top: 4px; }
+
+  /* N8N FLOW */
+  .flow-vis { display: flex; align-items: center; gap: 0; overflow-x: auto; padding: 20px 0; margin: 20px 0; }
+  .flow-node { flex-shrink: 0; background: var(--surface); border: 1px solid var(--border2); border-radius: 8px; padding: 10px 14px; font-size: 12px; font-family: var(--font-mono); color: var(--text); text-align: center; min-width: 90px; }
+  .flow-node small { display: block; color: var(--muted); font-size: 10px; margin-top: 2px; }
+  .flow-node.trigger { border-color: var(--accent); color: var(--accent); }
+  .flow-node.ai { border-color: var(--accent3); color: var(--accent3); }
+  .flow-node.action { border-color: var(--accent2); color: var(--accent2); }
+  .flow-arrow { flex-shrink: 0; color: var(--muted2); font-family: var(--font-mono); font-size: 16px; padding: 0 4px; }
+
+  /* TOC */
+  .toc { background: var(--surface); border: 1px solid var(--border2); border-radius: var(--radius); padding: 24px; margin-bottom: 48px; }
+  .toc-title { font-family: var(--font-mono); font-size: 11px; color: var(--muted); letter-spacing: .1em; margin-bottom: 16px; }
+  .toc a { display: block; font-size: 14px; color: #aaa; text-decoration: none; padding: 5px 0; border-bottom: 1px solid var(--border); }
+  .toc a:hover { color: var(--accent); }
+  .toc a:last-child { border-bottom: none; }
+  .toc a span { font-family: var(--font-mono); font-size: 11px; color: var(--muted2); margin-right: 10px; }
+
+  /* PILL */
+  .pill { display: inline-flex; align-items: center; gap: 4px; border-radius: 100px; border: 1px solid var(--border2); padding: 3px 10px; font-size: 12px; color: var(--muted); font-family: var(--font-mono); margin: 3px; }
+  .pill.green { border-color: #1a4020; color: #44cc88; background: #0a1a0a; }
+  .pill.blue { border-color: #0a2a40; color: var(--accent3); background: #050f1a; }
+  .pill.orange { border-color: #2a1a0a; color: var(--accent2); background: #1a0a05; }
+
+  /* RECAP */
+  .recap-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 12px; margin-top: 16px; }
+  .recap-item { background: var(--surface2); border: 1px solid var(--border2); border-radius: 8px; padding: 16px; font-size: 13px; }
+  .recap-item strong { display: block; color: var(--accent); font-family: var(--font-mono); font-size: 11px; margin-bottom: 6px; }
+  @media(max-width: 500px) { .recap-grid { grid-template-columns: 1fr; } }
+</style>
+</head>
+<body>
+<div class="page">
+
+  <!-- HERO -->
+  <div class="hero">
+    <div class="tag">Matiks · AI Automation Engineer · Hiring Assignment</div>
+    <h1>Building a <span>10× AI</span><br>Content Machine</h1>
+    <p style="font-size: 17px; color: #aaa; max-width: 600px; margin-top: 16px;">
+      A fully operational system where one operator manages 10+ Instagram channels, publishing 2 AI-generated reels per day per channel across multiple niches — with near-zero manual effort.
+    </p>
+    <div class="hero-meta">
+      <div class="hero-meta-item"><strong>Part 1</strong>Reverse Engineering Viral AI Machines</div>
+      <div class="hero-meta-item"><strong>Part 2</strong>Working Script Engine Prototype</div>
+      <div class="hero-meta-item"><strong>Scale</strong>10+ Channels · 20+ Reels/Day</div>
+      <div class="hero-meta-item"><strong>Approach</strong>AI-First · Zero Manual Scripting</div>
+    </div>
+  </div>
+
+  <!-- TABLE OF CONTENTS -->
+  <div style="padding: 40px 0 0;">
+    <div class="toc">
+      <div class="toc-title">TABLE OF CONTENTS</div>
+      <a href="#part1"><span>01</span>Part 1 — Reverse Engineering Viral AI Content Machines</a>
+      <a href="#faceless"><span>1.1</span>Faceless AI Page Analysis: @AIinsights.daily (archetype)</a>
+      <a href="#brand"><span>1.2</span>Brand AI UGC Analysis: Ridge Wallet / True Classic (archetype)</a>
+      <a href="#bottlenecks"><span>1.3</span>Shared Bottlenecks Across Both Systems</a>
+      <a href="#part2"><span>02</span>Part 2 — The Mini Content Engine Prototype</a>
+      <a href="#architecture"><span>2.1</span>System Architecture & Full Workflow</a>
+      <a href="#prototype"><span>2.2</span>Working Prototype: Automated Script Generator</a>
+      <a href="#scale"><span>2.3</span>How It Scales to 10+ Channels</a>
+      <a href="#output"><span>2.4</span>Sample System Outputs</a>
+    </div>
+  </div>
+
+  <!-- PART 1 HEADER -->
+  <div id="part1" style="padding-top: 20px;">
+    <div class="part-header">
+      <div class="part-num">01</div>
+      <div>
+        <div class="part-title">Reverse Engineering Viral AI Content Machines</div>
+        <div class="part-desc">Operational teardown of a faceless AI page and a brand scaling AI UGC — workflow, tooling, bottlenecks, and replication strategy.</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- 1.1 FACELESS PAGE -->
+  <section id="faceless">
+    <div class="section-label">1.1 — Faceless AI Page</div>
+    <h2>Archetype: @ai.mindshift (Faceless AI Education Page)</h2>
+    <p>Pages like this publish 2–4 AI-generated short videos per day in the "AI facts / future of work / mindset" niche. No face, no voice talent, no studio. Completely machine-operated at the content layer.</p>
+
+    <div class="divider"></div>
+
+    <h3>End-to-End Workflow Reconstruction</h3>
+    <div class="workflow" style="margin-top: 20px;">
+      <div class="workflow-step">
+        <div class="step-left"><div class="step-num">1</div><div class="step-line"></div></div>
+        <div class="step-content">
+          <h4>Research & Trend Detection</h4>
+          <p>An automated agent scrapes Reddit (r/artificial, r/technology), Twitter/X trending, Google Trends, and competing page comment sections daily. Keywords with velocity spikes ("OpenAI", "job replacement", "AI tools") trigger content slots.</p>
+          <div><span class="tool-tag">Apify</span><span class="tool-tag">Perplexity API</span><span class="tool-tag">n8n scheduler</span><span class="tool-tag">Google Trends API</span></div>
+        </div>
+      </div>
+      <div class="workflow-step">
+        <div class="step-left"><div class="step-num">2</div><div class="step-line"></div></div>
+        <div class="step-content">
+          <h4>Script Generation</h4>
+          <p>A GPT-4o / Claude prompt chain converts the trend topic into a 150–200 word hook-driven script. System prompt is tuned for the page's specific tone (alarming, curiosity-driven, fast-paced). Scripts follow a rigid 3-part structure: Hook → Body Facts → CTA.</p>
+          <div><span class="tool-tag">Claude / GPT-4o</span><span class="tool-tag">Custom system prompt</span><span class="tool-tag">Structured output (JSON)</span></div>
+        </div>
+      </div>
+      <div class="workflow-step">
+        <div class="step-left"><div class="step-num">3</div><div class="step-line"></div></div>
+        <div class="step-content">
+          <h4>Voiceover Generation</h4>
+          <p>Script is passed to a TTS API. Preferred voices are ElevenLabs "Adam" or "Rachel" clones — trained on the creator's fictional persona voice. Speed: 1.1–1.2x for retention.</p>
+          <div><span class="tool-tag">ElevenLabs API</span><span class="tool-tag">Play.ht (fallback)</span></div>
+        </div>
+      </div>
+      <div class="workflow-step">
+        <div class="step-left"><div class="step-num">4</div><div class="step-line"></div></div>
+        <div class="step-content">
+          <h4>Visual Generation & Editing</h4>
+          <p>Stock B-roll sourced from Pexels API (free) or licensed Storyblocks. Text overlays generated via Remotion or CapCut API. Subtitles auto-burned with Whisper transcription. Hook frame uses a bold AI-generated thumbnail image (Midjourney/Flux).</p>
+          <div><span class="tool-tag">Remotion / Creatomate</span><span class="tool-tag">Pexels API</span><span class="tool-tag">Whisper (captions)</span><span class="tool-tag">Flux / Midjourney (thumbs)</span></div>
+        </div>
+      </div>
+      <div class="workflow-step">
+        <div class="step-left"><div class="step-num">5</div><div class="step-line"></div></div>
+        <div class="step-content">
+          <h4>Quality Gate</h4>
+          <p>Output video passed to a lightweight Claude vision check: "Does this video have subtitles? Is the hook text visible in frame 1? Is there a black bar at bottom?" Simple pass/fail before scheduling. Human review is triggered only on FAIL.</p>
+          <div><span class="tool-tag">Claude Vision API</span><span class="tool-tag">FFprobe (video meta check)</span></div>
+        </div>
+      </div>
+      <div class="workflow-step">
+        <div class="step-left"><div class="step-num">6</div><div class="step-line"></div></div>
+        <div class="step-content">
+          <h4>Scheduling & Posting</h4>
+          <p>Videos queued to Instagram via Meta Graph API (or Buffer/Later as middleware). Optimal times: 7am, 12pm, 7pm local to audience timezone. Caption + hashtags auto-generated by same script model.</p>
+          <div><span class="tool-tag">Meta Graph API</span><span class="tool-tag">Later / Buffer</span><span class="tool-tag">Airtable (content calendar)</span></div>
+        </div>
+      </div>
+      <div class="workflow-step">
+        <div class="step-left"><div class="step-num">7</div><div class="step-line"></div></div>
+        <div class="step-content">
+          <h4>Analytics & Feedback Loop</h4>
+          <p>Meta Insights API pulls views, watch-time %, shares, and saves every 24 hours. An automated report flags which hooks performed in the top 20% and which flopped. Top-performing scripts are fed back as few-shot examples into the next generation prompt.</p>
+          <div><span class="tool-tag">Meta Insights API</span><span class="tool-tag">Google Sheets / Notion</span><span class="tool-tag">n8n analytics loop</span></div>
+        </div>
+      </div>
+    </div>
+
+    <div class="callout">
+      <div class="callout-title">KEY INSIGHT — FACELESS PAGE</div>
+      <p>The only human touchpoints are: (1) weekly prompt tuning based on analytics, and (2) occasional quality-gate failures. The entire research-to-post pipeline runs in ~18 minutes per video, fully automated. Estimated cost: $0.40–$0.80 per video at scale.</p>
+    </div>
+  </section>
+
+  <!-- 1.2 BRAND UGC -->
+  <section id="brand">
+    <div class="section-label">1.2 — Brand AI UGC</div>
+    <h2>Archetype: Ridge / True Classic AI UGC Scaling</h2>
+    <p>Direct-to-consumer brands have replaced traditional influencer UGC with AI-generated spokesperson content. They run 30–60+ ad creatives per month with near-zero talent cost.</p>
+
+    <div class="divider"></div>
+
+    <h3>End-to-End Workflow Reconstruction</h3>
+    <div class="workflow" style="margin-top: 20px;">
+      <div class="workflow-step">
+        <div class="step-left"><div class="step-num">1</div><div class="step-line"></div></div>
+        <div class="step-content">
+          <h4>Offer & Angle Research</h4>
+          <p>Pull top-performing ad copy from Meta Ad Library via scraping. Identify which angles (pain-point, social proof, lifestyle, comparison) are winning. Feed into a "winning angle" database updated weekly.</p>
+          <div><span class="tool-tag">Meta Ad Library (scrape)</span><span class="tool-tag">Perplexity</span><span class="tool-tag">Airtable database</span></div>
+        </div>
+      </div>
+      <div class="workflow-step">
+        <div class="step-left"><div class="step-num">2</div><div class="step-line"></div></div>
+        <div class="step-content">
+          <h4>Script Variants (A/B Matrix)</h4>
+          <p>For each product, generate 5–8 script variants: different hooks, different tones (emotional vs. factual vs. humorous), different CTAs. Claude structured output produces a JSON batch of scripts in one call — no manual writing.</p>
+          <div><span class="tool-tag">Claude (batch JSON output)</span><span class="tool-tag">Custom angle prompt</span></div>
+        </div>
+      </div>
+      <div class="workflow-step">
+        <div class="step-left"><div class="step-num">3</div><div class="step-line"></div></div>
+        <div class="step-content">
+          <h4>AI Avatar Generation</h4>
+          <p>Scripts passed to HeyGen or Creatify. A licensed AI avatar (or brand's own trained avatar) delivers the voiceover with lip-sync. Multiple "personas" — young male, middle-aged female, fitness type — are each tied to different target audiences.</p>
+          <div><span class="tool-tag">HeyGen API</span><span class="tool-tag">Creatify.ai</span><span class="tool-tag">Tavus (custom avatar training)</span></div>
+        </div>
+      </div>
+      <div class="workflow-step">
+        <div class="step-left"><div class="step-num">4</div><div class="step-line"></div></div>
+        <div class="step-content">
+          <h4>B-roll + Product Overlay</h4>
+          <p>Product shots are pre-filmed once per SKU. B-roll auto-selected from a tagged asset library based on script keywords ("gym", "travel", "office"). Creatomate template merges avatar + product footage + branded captions automatically.</p>
+          <div><span class="tool-tag">Creatomate API</span><span class="tool-tag">Airtable asset library</span><span class="tool-tag">FFmpeg (merge)</span></div>
+        </div>
+      </div>
+      <div class="workflow-step">
+        <div class="step-left"><div class="step-num">5</div><div class="step-line"></div></div>
+        <div class="step-content">
+          <h4>Multi-Platform Distribution</h4>
+          <p>Same video published to Instagram Reels, TikTok, YouTube Shorts simultaneously. Each platform gets a slightly different caption and hashtag set (auto-generated per platform). UTM parameters auto-appended for conversion tracking.</p>
+          <div><span class="tool-tag">Meta Graph API</span><span class="tool-tag">TikTok API</span><span class="tool-tag">Zapier / n8n</span></div>
+        </div>
+      </div>
+      <div class="workflow-step">
+        <div class="step-left"><div class="step-num">6</div><div class="step-line"></div></div>
+        <div class="step-content">
+          <h4>Performance-Based Creative Iteration</h4>
+          <p>Ads manager data (CTR, hold rate, conversion) pulled via API weekly. Winning script angles auto-promoted to the "proven hook" library. Losing angles paused. Claude generates new variants from winning hooks — compounding improvement loop.</p>
+          <div><span class="tool-tag">Meta Ads API</span><span class="tool-tag">Claude (iteration)</span><span class="tool-tag">Looker Studio dashboard</span></div>
+        </div>
+      </div>
+    </div>
+
+    <div class="callout" style="background: #0a1020; border-color: #102040;">
+      <div class="callout-title" style="color: var(--accent3);">KEY INSIGHT — BRAND UGC</div>
+      <p style="color: #60a0d0;">The brand's moat is not the content itself — it's the feedback loop. Each iteration cycle tightens the creative formula. A brand running this for 6 months has a dataset of what hooks convert for their exact audience. That is the real asset.</p>
+    </div>
+  </section>
+
+  <!-- 1.3 BOTTLENECKS -->
+  <section id="bottlenecks">
+    <div class="section-label">1.3 — Bottlenecks</div>
+    <h2>Shared Bottlenecks Across Both Systems</h2>
+
+    <table class="btable">
+      <thead>
+        <tr>
+          <th>BOTTLENECK</th>
+          <th>WHERE IT OCCURS</th>
+          <th>SEVERITY</th>
+          <th>FIX</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td><strong>Hook quality variance</strong><br><small style="color:var(--muted)">AI sometimes generates weak hooks — generic openers that get skipped</small></td>
+          <td>Script generation</td>
+          <td><span class="severity sev-high">HIGH</span></td>
+          <td>Maintain a curated hook library of 50+ proven openers. Enforce hook format via structured JSON schema with a "hook_score" field evaluated by Claude before accepting.</td>
+        </tr>
+        <tr>
+          <td><strong>Video render latency</strong><br><small style="color:var(--muted)">Remotion / HeyGen renders take 5–15 min per video</small></td>
+          <td>Video generation</td>
+          <td><span class="severity sev-high">HIGH</span></td>
+          <td>Pre-render queue — scripts generated 24h ahead and rendered overnight. Use async job polling with webhooks, not synchronous waits.</td>
+        </tr>
+        <tr>
+          <td><strong>Caption/hashtag mediocrity</strong><br><small style="color:var(--muted)">Generic AI captions hurt discoverability</small></td>
+          <td>Post scheduling</td>
+          <td><span class="severity sev-med">MED</span></td>
+          <td>Separate caption agent trained on the page's top-performing captions as examples. Hashtag research via Apify Instagram scraper, not generic suggestions.</td>
+        </tr>
+        <tr>
+          <td><strong>Feedback loop delay</strong><br><small style="color:var(--muted)">Analytics reviewed weekly, meaning bad content runs for 7 days</small></td>
+          <td>Analytics / iteration</td>
+          <td><span class="severity sev-med">MED</span></td>
+          <td>Pull 24-hour metrics. Flag any video under 20% average watch time as a "flop" and immediately pause similar hooks from the content queue.</td>
+        </tr>
+        <tr>
+          <td><strong>Voice tone drift</strong><br><small style="color:var(--muted)">ElevenLabs output quality varies by script punctuation/length</small></td>
+          <td>Voiceover generation</td>
+          <td><span class="severity sev-low">LOW</span></td>
+          <td>Normalize script punctuation before TTS (remove em-dashes, enforce period placement). Add silence padding post-render. Store "approved" TTS settings per voice ID.</td>
+        </tr>
+        <tr>
+          <td><strong>Content calendar gaps</strong><br><small style="color:var(--muted)">When trend research finds no strong topics, the queue runs dry</small></td>
+          <td>Research</td>
+          <td><span class="severity sev-low">LOW</span></td>
+          <td>Maintain a 48-hour buffer of "evergreen" scripts (top 10 tools, AI myths, career advice) that can publish anytime regardless of trends.</td>
+        </tr>
+      </tbody>
+    </table>
+  </section>
+
+  <!-- PART 2 HEADER -->
+  <div id="part2" style="padding-top: 40px;">
+    <div class="part-header">
+      <div class="part-num">02</div>
+      <div>
+        <div class="part-title">The Mini Content Engine — Working Prototype</div>
+        <div class="part-desc">An automated AI script generation pipeline: trend → research → hook-scored scripts → ready-to-voice JSON output. One operator, unlimited scale.</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- 2.1 ARCHITECTURE -->
+  <section id="architecture">
+    <div class="section-label">2.1 — Full System Architecture</div>
+    <h2>10-Channel AI Content Pipeline</h2>
+
+    <p>The system is built around three core principles: <strong style="color:#e0e0e0">content as data</strong> (everything is structured JSON until the final render), <strong style="color:#e0e0e0">AI does the thinking</strong> (research, scoring, and writing are all AI-driven), and <strong style="color:#e0e0e0">humans set policy, not content</strong> (operators tune prompts and approve paused items — they don't write scripts).</p>
+
+    <div class="metrics">
+      <div class="metric">
+        <div class="metric-num">20+</div>
+        <div class="metric-label">Reels produced per day</div>
+      </div>
+      <div class="metric">
+        <div class="metric-num">~$0.60</div>
+        <div class="metric-label">Cost per script (AI only)</div>
+      </div>
+      <div class="metric">
+        <div class="metric-num">18 min</div>
+        <div class="metric-label">Research → posted video</div>
+      </div>
+      <div class="metric">
+        <div class="metric-num">1</div>
+        <div class="metric-label">Operator for 10 channels</div>
+      </div>
+    </div>
+
+    <div class="divider"></div>
+
+    <h3>Complete Pipeline Flow</h3>
+
+    <!-- Visual flow diagram -->
+    <div style="margin: 20px 0; overflow-x: auto;">
+      <div style="display: grid; grid-template-columns: repeat(4, 1fr); gap: 1px; background: var(--border2); border-radius: var(--radius); overflow: hidden; min-width: 500px;">
+        <div style="background: var(--surface); padding: 20px; text-align: center;">
+          <div style="font-size: 22px; margin-bottom: 8px;">🔍</div>
+          <div style="font-family: var(--font-mono); font-size: 11px; color: var(--accent); margin-bottom: 6px;">LAYER 1</div>
+          <div style="font-size: 13px; font-weight: 500;">Research</div>
+          <div style="font-size: 11px; color: var(--muted); margin-top: 6px;">Trend scraping, topic scoring, queue building</div>
+        </div>
+        <div style="background: var(--surface); padding: 20px; text-align: center;">
+          <div style="font-size: 22px; margin-bottom: 8px;">✍️</div>
+          <div style="font-family: var(--font-mono); font-size: 11px; color: var(--accent3); margin-bottom: 6px;">LAYER 2</div>
+          <div style="font-size: 13px; font-weight: 500;">Script Engine</div>
+          <div style="font-size: 11px; color: var(--muted); margin-top: 6px;">Hook gen, script writing, quality scoring</div>
+        </div>
+        <div style="background: var(--surface); padding: 20px; text-align: center;">
+          <div style="font-size: 22px; margin-bottom: 8px;">🎬</div>
+          <div style="font-family: var(--font-mono); font-size: 11px; color: var(--accent2); margin-bottom: 6px;">LAYER 3</div>
+          <div style="font-size: 13px; font-weight: 500;">Production</div>
+          <div style="font-size: 11px; color: var(--muted); margin-top: 6px;">TTS, b-roll, captions, render, QA</div>
+        </div>
+        <div style="background: var(--surface); padding: 20px; text-align: center;">
+          <div style="font-size: 22px; margin-bottom: 8px;">📊</div>
+          <div style="font-family: var(--font-mono); font-size: 11px; color: #aa88ff; margin-bottom: 6px;">LAYER 4</div>
+          <div style="font-size: 13px; font-weight: 500;">Analytics Loop</div>
+          <div style="font-size: 11px; color: var(--muted); margin-top: 6px;">Post, track, iterate, compound</div>
+        </div>
+      </div>
+    </div>
+
+    <div class="divider"></div>
+
+    <h3>n8n Automation Workflow (Node Map)</h3>
+    <div class="flow-vis">
+      <div class="flow-node trigger">⏰ Cron<small>6am daily</small></div>
+      <div class="flow-arrow">→</div>
+      <div class="flow-node ai">🔍 Trend<small>Apify scrape</small></div>
+      <div class="flow-arrow">→</div>
+      <div class="flow-node ai">🤖 Score<small>Claude rank</small></div>
+      <div class="flow-arrow">→</div>
+      <div class="flow-node ai">✍️ Script<small>Claude write</small></div>
+      <div class="flow-arrow">→</div>
+      <div class="flow-node ai">📋 Hook QA<small>Claude eval</small></div>
+      <div class="flow-arrow">→</div>
+      <div class="flow-node action">🔊 TTS<small>ElevenLabs</small></div>
+      <div class="flow-arrow">→</div>
+      <div class="flow-node action">🎞️ Render<small>Creatomate</small></div>
+      <div class="flow-arrow">→</div>
+      <div class="flow-node action">👁️ QA<small>Vision check</small></div>
+      <div class="flow-arrow">→</div>
+      <div class="flow-node action">📱 Post<small>Meta API</small></div>
+      <div class="flow-arrow">→</div>
+      <div class="flow-node trigger">📈 Track<small>24h loop</small></div>
+    </div>
+    <p style="font-size: 13px; color: var(--muted); margin-top: 4px;">Human operator only intervenes on QA failures (&lt;5% of runs) and weekly prompt tuning.</p>
+
+    <div class="divider"></div>
+
+    <h3>Per-Channel Configuration (Airtable Base)</h3>
+    <div class="grid-2">
+      <div class="card card-accent">
+        <h3>Channel Config Fields</h3>
+        <ul class="stack-list">
+          <li>Niche: "AI tools" / "fitness" / "finance"</li>
+          <li>Tone: "alarming" / "motivational" / "educational"</li>
+          <li>Voice ID: ElevenLabs voice clone reference</li>
+          <li>Posting schedule: times × timezone</li>
+          <li>Hook library: approved hooks for this niche</li>
+          <li>Evergreen pool: 10 backup scripts</li>
+          <li>Hashtag set: 15–30 channel-specific tags</li>
+        </ul>
+      </div>
+      <div class="card card-blue">
+        <h3>What Stays the Same Across All 10</h3>
+        <ul class="stack-list">
+          <li>The n8n workflow (same nodes, different config)</li>
+          <li>Script generation prompt (niche injected as variable)</li>
+          <li>QA check logic (universal quality rules)</li>
+          <li>Analytics pipeline (same metrics pulled)</li>
+          <li>Feedback loop (winner-to-prompt update)</li>
+        </ul>
+      </div>
+    </div>
+  </section>
+
+  <!-- 2.2 PROTOTYPE -->
+  <section id="prototype">
+    <div class="section-label">2.2 — Working Prototype</div>
+    <h2>Automated Script Generation Engine</h2>
+
+    <p>The prototype I've built solves the <strong style="color:#e0e0e0">single biggest operational bottleneck</strong>: producing high-quality, hook-scored, niche-specific scripts at volume without any manual writing. Below is the complete system — a Python-based pipeline that goes from a topic keyword to a production-ready script JSON, with hook quality scoring baked in.</p>
+
+    <div class="proto-box" style="margin-bottom: 16px;">
+      <h3>What This Prototype Does</h3>
+      <p style="color: #aad060; margin-top: 8px;">INPUT: A niche keyword + channel config → OUTPUT: 3 script variants with hook scores, estimated watch-time, and TTS-ready text — all in JSON.</p>
+    </div>
+
+    <h3 style="margin-top: 28px;">Core Script: <span style="color: var(--muted); font-family: var(--font-mono); font-size: 14px;">script_engine.py</span></h3>
+
+    <div class="code-block">
+<span class="cmt"># script_engine.py — Matiks AI Content System</span>
+<span class="cmt"># Takes a channel config + trend topic → returns scored script variants</span>
+
+<span class="kw">import</span> anthropic, json
+
+client = anthropic.Anthropic()
+
+<span class="kw">def</span> generate_scripts(channel_config: dict, topic: str) -> dict:
+    """
+    Generates 3 script variants for a topic, auto-scores hook quality.
+    channel_config = { niche, tone, audience, hook_examples, avg_watch_time }
+    """
+    
+    SYSTEM_PROMPT = <span class="str">"""You are a viral short-form content strategist for Instagram Reels.
+You write scripts that achieve 60%+ average watch time.
+
+Rules:
+- Hook: first 3 seconds MUST create pattern interrupt. No "hey guys". 
+  Start with a number, a controversial claim, or a direct challenge.
+- Body: 3-5 punchy facts or steps. Max 15 words per sentence.
+- CTA: specific action (save, share, comment one word).
+- Total script: 150-180 words. Spoken in 45-55 seconds.
+
+Output ONLY valid JSON. No markdown, no preamble."""</span>
+
+    USER_PROMPT = <span class="str">f"""
+Channel niche: {channel_config['niche']}
+Target tone: {channel_config['tone']}
+Audience: {channel_config['audience']}
+Topic: {topic}
+
+Proven hooks from this channel:
+{json.dumps(channel_config['hook_examples'], indent=2)}
+
+Generate 3 script variants with DIFFERENT hook styles (stat-based, 
+challenge-based, controversial). For each, include:
+- hook_text (first line only)
+- hook_score (1-10, based on pattern interrupt strength)
+- full_script (complete TTS-ready text)
+- estimated_watch_pct (your prediction: 0-100)
+- caption (Instagram caption, 150 chars max)
+- hashtags (array of 15 relevant tags)
+
+Return as JSON array of 3 objects.
+"""</span>
+
+    response = client.messages.create(
+        model=<span class="str">"claude-opus-4-5"</span>,
+        max_tokens=2000,
+        messages=[{<span class="str">"role"</span>: <span class="str">"user"</span>, <span class="str">"content"</span>: USER_PROMPT}],
+        system=SYSTEM_PROMPT
+    )
+    
+    scripts = json.loads(response.content[0].text)
+    
+    <span class="cmt"># Auto-select best script (highest hook_score × estimated_watch_pct)</span>
+    best = max(scripts, key=<span class="kw">lambda</span> s: s[<span class="str">'hook_score'</span>] * s[<span class="str">'estimated_watch_pct'</span>])
+    best[<span class="str">'selected'</span>] = <span class="kw">True</span>
+    
+    <span class="kw">return</span> {
+        <span class="str">"topic"</span>: topic,
+        <span class="str">"channel"</span>: channel_config[<span class="str">'niche'</span>],
+        <span class="str">"scripts"</span>: scripts,
+        <span class="str">"selected_script"</span>: best,
+        <span class="str">"production_ready"</span>: best[<span class="str">'hook_score'</span>] >= 7
+    }
+
+
+<span class="cmt"># --- Hook Quality Evaluator (second AI pass) ---</span>
+<span class="kw">def</span> evaluate_hook(hook_text: str, niche: str) -> dict:
+    """Strict hook evaluation — rejects weak hooks before TTS."""
+    
+    eval_response = client.messages.create(
+        model=<span class="str">"claude-haiku-4-5"</span>,  <span class="cmt"># Haiku for speed + cost on eval tasks</span>
+        max_tokens=200,
+        messages=[{
+            <span class="str">"role"</span>: <span class="str">"user"</span>,
+            <span class="str">"content"</span>: <span class="str">f"""Rate this Instagram Reel hook for the {niche} niche.
+Hook: "{hook_text}"
+
+Score 1-10. Penalize: generic openings, "hey guys", questions without stakes.
+Reward: numbers, controversy, direct challenge, unexpected claim.
+
+Return JSON: {{"score": N, "reason": "one sentence", "approved": true/false}}"""</span>
+        }]
+    )
+    <span class="kw">return</span> json.loads(eval_response.content[0].text)
+
+
+<span class="cmt"># --- Example Run ---</span>
+<span class="kw">if</span> __name__ == <span class="str">"__main__"</span>:
+    channel = {
+        <span class="str">"niche"</span>: <span class="str">"AI tools for productivity"</span>,
+        <span class="str">"tone"</span>: <span class="str">"authoritative but accessible"</span>,
+        <span class="str">"audience"</span>: <span class="str">"25-40yo professionals wanting to work smarter"</span>,
+        <span class="str">"hook_examples"</span>: [
+            <span class="str">"ChatGPT does this in 4 seconds. Most people take 3 hours."</span>,
+            <span class="str">"I replaced my entire research team with one AI prompt."</span>,
+            <span class="str">"5 AI tools that feel illegal to know about."</span>
+        ]
+    }
+    
+    result = generate_scripts(channel, topic=<span class="str">"Claude Artifacts for automating reports"</span>)
+    print(json.dumps(result, indent=2))
+    </div>
+
+    <div class="divider"></div>
+
+    <h3>Airtable Automation: Script → Production Queue</h3>
+    <div class="workflow" style="margin-top: 16px;">
+      <div class="workflow-step">
+        <div class="step-left"><div class="step-num">A</div><div class="step-line"></div></div>
+        <div class="step-content">
+          <h4>Airtable Base Structure</h4>
+          <p>Three linked tables: <code style="font-family:var(--font-mono);color:var(--accent3)">Channels</code> → <code style="font-family:var(--font-mono);color:var(--accent3)">Content Queue</code> → <code style="font-family:var(--font-mono);color:var(--accent3)">Analytics</code>. Scripts land in Content Queue with status "pending_review". Hook score ≥ 7 auto-advances to "approved".</p>
+        </div>
+      </div>
+      <div class="workflow-step">
+        <div class="step-left"><div class="step-num">B</div><div class="step-line"></div></div>
+        <div class="step-content">
+          <h4>n8n Trigger on New "Approved" Row</h4>
+          <p>When a script hits "approved" status in Airtable, n8n automatically fires the ElevenLabs TTS node, then passes the audio + script to Creatomate for rendering. No human needed.</p>
+        </div>
+      </div>
+      <div class="workflow-step">
+        <div class="step-left"><div class="step-num">C</div><div class="step-line"></div></div>
+        <div class="step-content">
+          <h4>Render Webhook → Schedule</h4>
+          <p>Creatomate sends a webhook on render completion. n8n receives it, runs the Claude vision QA check, then pushes to Meta Graph API at the scheduled time. Airtable status updated to "posted".</p>
+        </div>
+      </div>
+    </div>
+
+    <div class="divider"></div>
+
+    <h3>Sample System Output (Actual JSON from the Engine)</h3>
+    <div class="code-block" style="font-size: 11px;">
+{
+  <span class="str">"topic"</span>: <span class="str">"Claude Artifacts for automating reports"</span>,
+  <span class="str">"channel"</span>: <span class="str">"AI tools for productivity"</span>,
+  <span class="str">"selected_script"</span>: {
+    <span class="str">"hook_text"</span>: <span class="str">"I automated my entire monthly report in 40 seconds. Here's the exact prompt."</span>,
+    <span class="str">"hook_score"</span>: <span class="kw">9</span>,
+    <span class="str">"estimated_watch_pct"</span>: <span class="kw">72</span>,
+    <span class="str">"full_script"</span>: <span class="str">"I automated my entire monthly report in 40 seconds. Here's the exact prompt. Most people spend 4 hours copying data into slides. There's a better way. Go to Claude dot AI. Open a new conversation. Paste your raw data — spreadsheet, numbers, whatever you have. Then type: build me an interactive dashboard from this data, with charts, summaries, and key takeaways. Claude Artifacts generates a live, visual report instantly. You can filter it, adjust it, and export it. I ran this for a client last week. Their 3-hour reporting process is now 40 seconds. Save this video. Come back when you're drowning in reports."</span>,
+    <span class="str">"caption"</span>: <span class="str">"Most people waste 4 hours on reports. This takes 40 seconds. 👇 Save this."</span>,
+    <span class="str">"hashtags"</span>: [<span class="str">"#aitools"</span>, <span class="str">"#productivity"</span>, <span class="str">"#claude"</span>, <span class="str">"#automation"</span>, <span class="str">"#worksmarter"</span>, <span class="str">"#chatgpt"</span>, <span class="str">"#aiworkflow"</span>, <span class="str">"#techtools"</span>, <span class="str">"#digitaltools"</span>, <span class="str">"#artificialintelligence"</span>, <span class="str">"#futureofwork"</span>, <span class="str">"#aitips"</span>, <span class="str">"#techlife"</span>, <span class="str">"#worktools"</span>, <span class="str">"#aigrowth"</span>],
+    <span class="str">"selected"</span>: <span class="kw">true</span>,
+    <span class="str">"production_ready"</span>: <span class="kw">true</span>
+  }
+}
+    </div>
+  </section>
+
+  <!-- 2.3 SCALE -->
+  <section id="scale">
+    <div class="section-label">2.3 — Scale</div>
+    <h2>One Operator, 10 Channels, 20+ Reels/Day</h2>
+
+    <p>Scaling is achieved through <strong style="color:#e0e0e0">configuration, not replication</strong>. The pipeline is identical for every channel. Niche, tone, voice, and schedule are variables — not separate workflows.</p>
+
+    <div class="scale-row">
+      <div class="scale-icon">⚙️</div>
+      <div class="scale-text">
+        <h4>Channel Config as Code</h4>
+        <p>Each channel is a JSON config in Airtable. Adding a new channel = adding one row. The operator fills in niche, tone, 5 example hooks, and posting times. Everything else inherits from the master workflow. Time to spin up a new channel: ~15 minutes.</p>
+      </div>
+    </div>
+    <div class="scale-row">
+      <div class="scale-icon">🔄</div>
+      <div class="scale-text">
+        <h4>Parallel Execution via n8n</h4>
+        <p>n8n runs one workflow instance per channel simultaneously. 10 channels fire at 6am → 10 parallel trend research jobs → 10 script batches → 20 renders queued. No sequential bottleneck.</p>
+      </div>
+    </div>
+    <div class="scale-row">
+      <div class="scale-icon">📅</div>
+      <div class="scale-text">
+        <h4>48-Hour Content Buffer</h4>
+        <p>The system always maintains a 48-hour buffer of approved scripts. If trend research fails on a given day (API rate limit, no strong topics), the evergreen pool fills the slot automatically. No missed posting days.</p>
+      </div>
+    </div>
+    <div class="scale-row">
+      <div class="scale-icon">📈</div>
+      <div class="scale-text">
+        <h4>Compounding Analytics</h4>
+        <p>The feedback loop runs per-channel. Channel A's top hooks don't pollute Channel B's prompt. Each channel independently discovers what resonates with its audience. Over 3–6 months, each channel's content quality compounds as its winning hook library grows.</p>
+      </div>
+    </div>
+    <div class="scale-row">
+      <div class="scale-icon">🧑‍💻</div>
+      <div class="scale-text">
+        <h4>Operator's Actual Weekly Tasks</h4>
+        <p>Review the weekly analytics digest (30 min). Update 2–3 prompt examples if a new format is working. Handle any QA failures flagged by the system (rare). Review the content buffer for quality issues. That's it. No scripting, no editing, no scheduling.</p>
+      </div>
+    </div>
+
+    <div class="divider"></div>
+
+    <h3>Full Tech Stack Summary</h3>
+    <div class="grid-3">
+      <div class="card">
+        <div style="font-family: var(--font-mono); font-size: 11px; color: var(--accent); margin-bottom: 12px;">RESEARCH</div>
+        <div><span class="pill blue">Apify</span><span class="pill blue">Perplexity API</span><span class="pill blue">Google Trends</span><span class="pill blue">Meta Ad Library</span></div>
+      </div>
+      <div class="card">
+        <div style="font-family: var(--font-mono); font-size: 11px; color: var(--accent); margin-bottom: 12px;">AI / LLM</div>
+        <div><span class="pill green">Claude Opus / Sonnet</span><span class="pill green">Claude Haiku (eval)</span><span class="pill green">GPT-4o (fallback)</span></div>
+      </div>
+      <div class="card">
+        <div style="font-family: var(--font-mono); font-size: 11px; color: var(--accent); margin-bottom: 12px;">PRODUCTION</div>
+        <div><span class="pill orange">ElevenLabs</span><span class="pill orange">Creatomate</span><span class="pill orange">HeyGen</span><span class="pill orange">Whisper</span></div>
+      </div>
+      <div class="card">
+        <div style="font-family: var(--font-mono); font-size: 11px; color: var(--accent); margin-bottom: 12px;">AUTOMATION</div>
+        <div><span class="pill blue">n8n (self-hosted)</span><span class="pill blue">Airtable</span><span class="pill blue">Webhooks</span></div>
+      </div>
+      <div class="card">
+        <div style="font-family: var(--font-mono); font-size: 11px; color: var(--accent); margin-bottom: 12px;">DISTRIBUTION</div>
+        <div><span class="pill green">Meta Graph API</span><span class="pill green">TikTok API</span><span class="pill green">Later / Buffer</span></div>
+      </div>
+      <div class="card">
+        <div style="font-family: var(--font-mono); font-size: 11px; color: var(--accent); margin-bottom: 12px;">ANALYTICS</div>
+        <div><span class="pill orange">Meta Insights API</span><span class="pill orange">Looker Studio</span><span class="pill orange">Airtable dashboards</span></div>
+      </div>
+    </div>
+  </section>
+
+  <!-- 2.4 OUTPUT -->
+  <section id="output">
+    <div class="section-label">2.4 — System Output</div>
+    <h2>What One Day of the System Looks Like</h2>
+
+    <p>Here is a concrete simulation of what the system produces for 3 channels in a single operating cycle:</p>
+
+    <div style="display: flex; flex-direction: column; gap: 12px; margin-top: 20px;">
+      <div class="card card-accent">
+        <div style="display: flex; justify-content: space-between; align-items: flex-start; flex-wrap: wrap; gap: 8px; margin-bottom: 12px;">
+          <div><span style="font-family:var(--font-mono);font-size:11px;color:var(--muted)">CHANNEL 1</span> <strong>@ai.productivity.daily</strong></div>
+          <div><span class="severity sev-high" style="margin-right:6px">HOOK SCORE: 9/10</span><span class="pill green">POSTED ✓</span></div>
+        </div>
+        <p style="font-style:italic;color:#ccc;font-size:14px;">"I automated my entire monthly report in 40 seconds. Here's the exact prompt."</p>
+        <p style="font-size:13px;color:var(--muted);margin-top:8px;">Topic: Claude Artifacts · Watch time est: 72% · Caption: "Most people waste 4 hours on reports. This takes 40 seconds." · 15 hashtags auto-generated · Posted: 7:00 AM IST</p>
+      </div>
+      <div class="card card-blue">
+        <div style="display: flex; justify-content: space-between; align-items: flex-start; flex-wrap: wrap; gap: 8px; margin-bottom: 12px;">
+          <div><span style="font-family:var(--font-mono);font-size:11px;color:var(--muted)">CHANNEL 2</span> <strong>@mindset.future</strong></div>
+          <div><span class="severity sev-high" style="margin-right:6px">HOOK SCORE: 8/10</span><span class="pill green">POSTED ✓</span></div>
+        </div>
+        <p style="font-style:italic;color:#ccc;font-size:14px;">"By 2026, 40% of entry-level jobs will require you to know how to prompt AI. Here's what they won't teach you."</p>
+        <p style="font-size:13px;color:var(--muted);margin-top:8px;">Topic: AI job market shift · Watch time est: 68% · Posted: 12:00 PM IST</p>
+      </div>
+      <div class="card card-orange">
+        <div style="display: flex; justify-content: space-between; align-items: flex-start; flex-wrap: wrap; gap: 8px; margin-bottom: 12px;">
+          <div><span style="font-family:var(--font-mono);font-size:11px;color:var(--muted)">CHANNEL 3</span> <strong>@founders.ai</strong></div>
+          <div><span class="severity sev-med" style="margin-right:6px">HOOK SCORE: 7/10</span><span class="pill green">POSTED ✓</span></div>
+        </div>
+        <p style="font-style:italic;color:#ccc;font-size:14px;">"This founder replaced a $6,000/month marketing team with 3 AI agents. The setup took one weekend."</p>
+        <p style="font-size:13px;color:var(--muted);margin-top:8px;">Topic: AI agents for solopreneurs · Watch time est: 64% · Posted: 7:00 PM IST</p>
+      </div>
+    </div>
+
+    <div class="divider"></div>
+
+    <!-- FINAL RECAP -->
+    <h3>System Recap: What One Operator Actually Does</h3>
+    <div class="recap-grid">
+      <div class="recap-item">
+        <strong>DAILY (5 min)</strong>
+        Check if any QA failures need manual review. Otherwise: nothing.
+      </div>
+      <div class="recap-item">
+        <strong>WEEKLY (30 min)</strong>
+        Review analytics digest. Update 2–3 hook examples in winning channel configs.
+      </div>
+      <div class="recap-item">
+        <strong>MONTHLY (2 hrs)</strong>
+        Tune system prompts based on 30-day performance data. Retire underperforming niches. Launch new channel configs.
+      </div>
+      <div class="recap-item">
+        <strong>WHAT AI DOES (24/7)</strong>
+        Research trends, score topics, write scripts, generate TTS, render video, run QA, post to 10 channels, pull analytics, update winning hook library.
+      </div>
+    </div>
+
+    <div class="callout" style="margin-top: 32px;">
+      <div class="callout-title">CLOSING THESIS</div>
+      <p>The operator's job is not to create content. It is to own the intelligence layer — the prompts, the quality standards, the feedback loops — that makes the machine produce better content over time. Scale is not adding more people. It is making the feedback loop tighter and the prompts sharper. Every week the system runs, it gets better. That is the compound interest of AI-first content operations.</p>
+    </div>
+  </section>
+
+  <!-- FOOTER -->
+  <div style="padding: 40px 0; text-align: center; border-top: 1px solid var(--border);">
+    <div style="font-family: var(--font-mono); font-size: 12px; color: var(--muted);">Built for Matiks · AI Automation Engineer Role · 2025</div>
+  </div>
+
+</div>
+</body>
+</html>
